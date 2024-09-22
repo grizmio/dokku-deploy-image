@@ -1,0 +1,4 @@
+[plugin]
+description = "Pull and deploy a docker image"
+version = "0.34.8"
+[plugin.config]

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
+source "$PLUGIN_CORE_AVAILABLE_PATH/common/functions"
+
+deploy_image_deploy_cmd() {
+  #shellcheck disable=SC2034
+  declare desc="Run docker pull and rebuild"
+  local cmd="deploy-image:deploy"
+  local argv=("$@")
+  local DOKKU_BIN="$(which dokku)"
+
+  [[ ${argv[0]} == "$cmd" ]] && shift 1
+  set -- $cmd $@
+
+  APP_NAME="$2"
+  [[ -z "${APP_NAME}" ]] && dokku_log_fail "Please specify an app"
+
+  DOCKER_IMAGE="$3"
+  [[ -z "${DOCKER_IMAGE}" ]] && dokku_log_fail "Please specify a docker image to pull"
+
+  "$DOCKER_BIN" pull "${DOCKER_IMAGE}" && "${DOKKU_BIN}" ps:rebuild "${APP_NAME}"
+}
+
+deploy_image_deploy_cmd "$@"
